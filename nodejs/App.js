@@ -2,6 +2,14 @@ const { MongoClient } = require('mongodb')
 const { ethers } = require('ethers')
 var crypto = require('crypto')
 
+const express = require('express')
+const cookieParser = require('cookie-parser')
+const app = express()
+app.use(cookieParser())
+app.use(express.json())
+
+const sessions = {}
+
 const ERC20_ABI = [
     'function name() view returns (string)',
     'function symbol() view returns (string)',
@@ -16,17 +24,55 @@ function generateWallet() {
 
 async function main() {
 
-  const uri = 'mongodb://dapp:22fall-msbd5017@124.223.197.77:35017/mylink'
-  const client = new MongoClient(uri)
+    const uri = 'mongodb://dapp:22fall-msbd5017@124.223.197.77:35017/mylink'
+    const client = new MongoClient(uri)
 
-    try {
-        await client.connect()
-    } catch (e) {
-        console.error(e)
-    }
-
+    await client.connect()
     const database = client.db('mylink')
     const Users = database.collection('User')
+
+    app.post('/register', async (req, res) => {
+        const { username, password } = req.body
+        let user = await Users.findOne({username: username})
+        if (user != null) {
+            res.status(403).json({message: 'Username already existed'})
+        }
+        else {
+            const pwHash = crypto.createHash('sha1').update(password).digest('hex')
+            let [key, address] = generateWallet()
+            let record = {
+                privateKey: key,
+                address: address,
+                username: userName,
+                password: pwHash
+            }
+            await Users.insertOne(record)
+            let token = crypto.randomBytes(8).toString('hex')
+            sessions[token] = username
+            res.cookie('session', token, {maxAge: 900000})
+            res.status(200).json({message: 'Registration successful'})
+        }
+    })
+
+    app.post('/login', async (req, res) => {
+        const { username, password } = req.body
+        const pwHash = crypto.createHash('sha1').update(password).digest('hex')
+        let user = await Users.findOne({username: userName, password: pwHash})
+        if (user == null) {
+            res.status(400).json({message: 'Username or password incorrect'})
+        }
+        else {
+            let token = crypto.randomBytes(8).toString('hex')
+            sessions[token] = username
+            res.cookie('session', token, {maxAge: 900000})
+            res.status(200).json({message: 'Login successful'})
+        }
+    })
+
+    app.get('/logout', async (req, res) => {
+        res.clearCookie('session')
+        res.status(200).json({message: 'Login successful'})
+    })
 
     const password = 'password'
     const userName = 'Test-User'
@@ -57,4 +103,5 @@ async function main() {
     console.log([name, symbol, totalSupply])
 }
 
-main().catch(console.error)
+main()
+app.listen(5017)
