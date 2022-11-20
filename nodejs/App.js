@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb')
 const { ethers } = require('ethers')
-var crypto = require('crypto')
+const crypto = require('crypto')
+const { ABI } = require('./ABI.js')
 
 const express = require('express')
 const cookieParser = require('cookie-parser')
@@ -9,12 +10,6 @@ app.use(cookieParser())
 app.use(express.json())
 
 const sessions = {}
-
-const ERC20_ABI = [
-    'function name() view returns (string)',
-    'function symbol() view returns (string)',
-    'function totalSupply() view returns (uint256)'
-]
 
 function generateWallet() {
     let privateKey = '0x' + crypto.randomBytes(32).toString('hex')
@@ -92,15 +87,19 @@ async function main() {
     let user = await Users.findOne({username: userName, password: pwHash})
     console.log(user)
 
-    const provider = new ethers.providers.JsonRpcBatchProvider('https://sepolia.infura.io/v3/f7dc6979c2734c8ba8d524c9a6802cb9')
+    const provider = new ethers.providers.JsonRpcBatchProvider('https://rpc.debugchain.net')
+    
+    const contractAddress = '0xbfE5Fba9B2AAC73CcBedCF69592F09dE5C2536d4'
+    const contract = new ethers.Contract(contractAddress, ABI, provider)
 
-    const contractAddress = '0x96a0F1De80e2baf262DEC7940B38ABeB52Aed571'
-    const contract = new ethers.Contract(contractAddress, ERC20_ABI, provider)
+    const myAddress = '0x3E2382C8cf290591DE1FE7d981a16EC9A8d89391'
+    const privateKey = '2d0afce8ad2de9cbf863bda216b1c40ded421110d743d3467813f246d443142b'
+    const wallet = new ethers.Wallet(privateKey, provider)
+    const contractW = contract.connect(wallet)
 
-    const name = await contract.name()
-    const symbol = await contract.symbol()
-    const totalSupply = await contract.totalSupply()
-    console.log([name, symbol, totalSupply])
+    const success = await contractW.mint(myAddress, 'https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg', '1kk3')
+    let tok = await contractW.getToken(2)
+    console.log(tok)
 }
 
 main()
