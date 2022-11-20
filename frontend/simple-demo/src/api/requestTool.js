@@ -37,7 +37,7 @@ export function requestService(config) {
             console.log('response data is: ' + results.code)
             return res;
         },
-        error => {
+        err => {
             if (err && err.response) {
                 switch (err.response.status) {
                     case 400:
@@ -88,7 +88,7 @@ export function requestService(config) {
                 }
             }
             ElMessage.error(`ERROR: ${err}`);
-            return Promise.reject(error)
+            return Promise.reject(err)
         }
     )
     return service(config)

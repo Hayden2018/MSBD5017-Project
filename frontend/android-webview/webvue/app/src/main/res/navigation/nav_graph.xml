@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/webview_in_frag">
+
+
+    <fragment
+        android:id="@+id/webview_in_frag"
+        android:name="com.example.webvue.Webview"
+        android:label="Webview Fragment"
+        tools:layout="@layout/fragment_webview">
+
+    </fragment>
+</navigation>
