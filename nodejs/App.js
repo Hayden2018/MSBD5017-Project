@@ -26,6 +26,17 @@ async function main() {
     const database = client.db('mylink')
     const Users = database.collection('User')
 
+
+    // for local debug
+    app.all('*', (req, res, next) => {
+        var origin = req.headers.origin;
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, token');
+        res.header('Access-Control-Allow-Credentials', true);
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS, DELETE');
+        next()
+      });
+
     app.post('/register', async (req, res) => {
         const { username, password } = req.body
         let user = await Users.findOne({username: username})
@@ -66,7 +77,7 @@ async function main() {
 
     app.get('/logout', async (req, res) => {
         res.clearCookie('session')
-        res.status(200).json({message: 'Login successful'})
+        res.status(200).json({message: 'Logout successful'})
     })
 
     const password = 'password'
