@@ -26,16 +26,15 @@ async function main() {
     const database = client.db('mylink')
     const Users = database.collection('User')
 
-
     // for local debug
     app.all('*', (req, res, next) => {
-        var origin = req.headers.origin;
-        res.header('Access-Control-Allow-Origin', origin);
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, token');
-        res.header('Access-Control-Allow-Credentials', true);
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS, DELETE');
+        var origin = req.headers.origin
+        res.header('Access-Control-Allow-Origin', origin)
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, token')
+        res.header('Access-Control-Allow-Credentials', true)
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS, DELETE')
         next()
-      });
+    })
 
     app.post('/register', async (req, res) => {
         const { username, password } = req.body
@@ -49,7 +48,7 @@ async function main() {
             let record = {
                 privateKey: key,
                 address: address,
-                username: userName,
+                username: username,
                 password: pwHash
             }
             await Users.insertOne(record)
@@ -80,23 +79,51 @@ async function main() {
         res.status(200).json({message: 'Logout successful'})
     })
 
-    const password = 'password'
-    const userName = 'Test-User'
+    app.get('/nft/view', async (req, res) => {
+        let s = req.cookies['session']
+        let userName = sessions[s]
+        if (userName) {
+            let payload = [
+                {
+                    tokenId: 1,
+                    url: 'https://oganiza.com/wp-content/uploads/2021/10/NFT-non-fungible-token.2-810x524-1.jpg'
+                }
+            ]
+            res.status(200).json(payload)
+        }
+        else {
+            res.status(401).json({error: 'Invalid session token'})
+        }
+    })
 
-    const pwHash = crypto.createHash('sha1').update(password).digest('hex')
+    app.post('/nft/transfer', async (req, res) => {
+        let address = req.body.address
+        let s = req.cookies['session']
+        let userName = sessions[s]
+        if (userName && address) {
+            res.status(200).json({message: 'Success'})
+        }
+        else {
+            res.status(401).json({error: 'Invalid session token or address'})
+        }
+    })
 
-    let [key, address] = generateWallet()
-
-    let record = {
-        privateKey: key,
-        address: address,
-        username: userName,
-        password: pwHash
-    }
-    await Users.insertOne(record)
-
-    let user = await Users.findOne({username: userName, password: pwHash})
-    console.log(user)
+    app.get('/nft/mint', async (req, res) => {
+        let s = req.cookies['session']
+        let userName = sessions[s]
+        if (userName) {
+            let payload = [
+                {
+                    tokenId: 2,
+                    url: 'https://oganiza.com/wp-content/uploads/2021/10/NFT-non-fungible-token.2-810x524-1.jpg'
+                }
+            ]
+            res.status(200).json(payload)
+        }
+        else {
+            res.status(401).json({error: 'Invalid session token or address'})
+        }
+    })
 
     const provider = new ethers.providers.JsonRpcBatchProvider('https://rpc.debugchain.net')
     
