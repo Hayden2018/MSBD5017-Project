@@ -1,0 +1,120 @@
+.icon {
+    display: flex;
+  }
+  .ncard {
+    background-color: #15263F;
+    color: #8BACD9;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 5px;
+    width: 450px;
+    font-size: 1.5rem;
+    box-shadow: 0 25px 50px 0 rgba(0,0,0,0.1);
+    @media screen and (min-width: 500px) {
+      font-size: 1.6rem;
+      width: 450px;
+      padding-bottom: 32px;
+    }
+    // @media screen and (min-width: 300px) {
+    //   font-size: 1.6rem;
+    //   width: 120px;
+    //   padding-bottom: 32px;
+    // }
+    .ncard-product-img {
+      cursor: pointer;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      @mixin hoverOpacity {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.25s ease-out;
+      }
+      &::after {
+        @include hoverOpacity;
+        background: no-repeat rgba(0, 255, 255, 0.5) url(vicon) center;
+      }
+      &:hover {
+        &::after {
+          opacity: 1;
+        }
+      }
+    }
+    .ncard-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 24px 0 16px 0;
+      @media screen and (min-width: 768px) {
+        gap: 16px;
+        padding: 24px 0;
+      }
+      .ncard-name {
+        color: white;
+        font-size: 2.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        &:hover {
+          color: #00FFF8;
+        }
+      }
+      .ncard-description {
+        font-size: 1.8rem;
+        line-height: 2.6rem;
+        font-weight: lighter;
+      }
+      .ncard-content-bottom {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 4px;
+        @media screen and (min-width: 768px) {
+          padding-top: 6px;
+        }
+        > * {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 600;
+        }
+        .ncard-price {
+          color: #00FFF8;
+        }
+      }
+    }
+    .ncard-footer {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #2E405A;
+      gap: 16px;
+      padding-top: 16px;
+      .ncard-avatar {
+        display: flex;
+        border-radius: 90px;
+        border: 1px solid white;
+        img {
+          width: 33px;
+        }
+      }
+      .ncard-autor--alt-color {
+        color: white;
+        cursor: pointer;
+        &:hover {
+          color: #00FFF8;
+        }
+      }
+    }
+  }
+  
+  //Transition
+  .fade-enter-active,
+  .fade-leave-active {
+      transition: 0.25s ease-out;
+  }
+  .fade-leave-to,
+  .fade-enter-from {
+    opacity: 0;
+  }
