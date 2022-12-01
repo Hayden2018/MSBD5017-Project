@@ -2,13 +2,8 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
- * @custom:dev-run-script ./scripts/deploy_with_ethers.ts
- */
-
 struct token {
+    uint256 id;
     address owner;
     string url;
     string md5;
@@ -25,16 +20,28 @@ contract myNFT {
     constructor() {
         counter = 1;
         master = msg.sender;
-        tokens[counter] = token(master, "https://upload.wikimedia.org/wikipedia/commons/d/d0/Eth-diamond-rainbow.png", "f1e4763234ae9a865b54eaf89fff4638");
-        balance[master] += 1;
-        counter += 1;
     }
 
-    function mint(address owner, string memory image, string memory md5) external returns (bool) {
+    function mint(address owner, string memory image, string memory md5) external returns (uint256) {
         require(master == msg.sender);
-        tokens[counter] = token(owner, image, md5);
+        tokens[counter] = token(counter, owner, image, md5);
         balance[owner] += 1;
-        return true;
+        counter += 1;
+        return counter - 1;
+    }
+
+    function allTokenOfOwner(address owner)  public view returns (token[] memory) {
+
+        token[] memory results = new token[](balance[owner]);
+        uint256 c = 0;
+
+        for (uint256 i = 1; i < counter; i++) {
+            if (tokens[i].owner == owner) {
+                results[c] = tokens[i];
+                ++c;
+            }
+        }
+        return results;
     }
 
     function balanceOf(address owner) external view returns (uint256) {
