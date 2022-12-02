@@ -36,7 +36,7 @@ export default defineConfig(({ command, mode }) => {
         cors: true
       },
       build: {
-        outDir: '../server/dist',
+        outDir: '../../nodejs/dist',
       }
     }
   }
@@ -51,7 +51,7 @@ export default defineConfig(({ command, mode }) => {
         }
       },
       build: {
-        outDir: '../server/dist'
+        outDir: '../../nodejs/dist'
       }
     }
   }

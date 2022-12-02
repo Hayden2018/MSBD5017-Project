@@ -21,6 +21,7 @@ export function httpService(config: any) {
     instance.interceptors.request.use((config: any) => {
         return config;
     }, (err: any) => {
+        alert("Request Error: " + err.message);
         return Promise.reject(err);
     });
 
@@ -29,6 +30,7 @@ export function httpService(config: any) {
         console.log(res.headers['set-cookie']);
         return res;
     }, (err: any) => {
+        alert("Response Error: " + err.message);
         return Promise.reject(err);
     });
 

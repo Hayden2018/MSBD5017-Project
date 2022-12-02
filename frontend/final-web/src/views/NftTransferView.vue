@@ -22,7 +22,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
-        ref="modalRef">
+        ref="modalRef" style="z-index=200">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -74,8 +74,6 @@ const showSetTarget = () => {
 
 // define tools button
 let items = reactive([
-    { name: "Show My Wallet" },
-
     {
         name: "Set Target Wallet"
     },
@@ -96,14 +94,14 @@ let toolsBtnTheme = reactive({
 
 // click event
 const handleSelection = (selectedItem:string) => {
+    // if (selectedItem === items[0].name) {
+    //     console.log("Show Wallet Address");
+    // }
     if (selectedItem === items[0].name) {
-        console.log("Show Wallet Address");
-    }
-    else if (selectedItem === items[1].name) {
         console.log("Set Target Wallet")
         showSetTarget()
     }
-    else if (selectedItem === items[2].name) {
+    else if (selectedItem === items[1].name) {
         makeTransfer()
     }
 };
@@ -173,9 +171,9 @@ const saveWallet = () => {
     if (tempAddress.value === '') {
         alert("Please input wallet address")
     }
-    else if (isEtherAddress(tempAddress.value)) {
-        alert("Invalid wallet address")
-    }
+    // else if (isEtherAddress(tempAddress.value)) {
+    //     alert("Invalid wallet address")
+    // }
     else {
         console.log("wallet is ok")
         address.value = tempAddress.value
@@ -205,8 +203,8 @@ const makeTransfer = async () => {
     let transition = {
         address: address.value,
         tokenId: selectedNFTs.map(function (value) {
-            console.log("value", value.id)
-            return value.id
+            console.log("value", value.tokenId)
+            return value.tokenId
         })
     }
     console.log("transition", transition.tokenId)
@@ -225,6 +223,9 @@ const makeTransfer = async () => {
 </script>
 
 <style lang="scss" scoped>
+
+
+
 .imgList {
     width: 98%;
     margin: 10px 0;
