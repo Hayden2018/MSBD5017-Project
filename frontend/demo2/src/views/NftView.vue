@@ -4,7 +4,8 @@
 <div class="card mb-3" v-for="(item ,index) in cardList" style="background-color: #15263F; color:azure">
   <img :src="item.img" class="card-img-top" alt="...">
   <div class="card-body">
-    <center><h5 class="card-title">{{item.id}}</h5></center>
+    <center><h5 class="card-title">Token Id: {{item.tokenId}}</h5></center>
+    <center><p class="card-text">MD5: {{item.md5}}</p></center>
   </div>
 </div>
 
@@ -20,12 +21,14 @@ import { useRoute, useRouter } from 'vue-router';
 
 
 const router = useRouter();
-
+const BASE_IMG_URL = import.meta.env.PROD? '' :"http://localhost:5017/"
 
 let getdata = ref(false)
 type Card = {
-    id: number;
+    tokenId: number;
     img: string;
+    md5: string;
+
 }
 // imglist
 let cardList:Array<Card> = reactive([])
@@ -44,12 +47,13 @@ const getImg = async () => {
         cardList.length = 0
         // get each img
         for (let i = 0; i < res.data.length; i++) {
-
             cardList.push({
-                img: res.data[i].url,
-                id: res.data[i].tokenId
+                img: BASE_IMG_URL +  res.data[i].url.toString().split('/')[1],
+                tokenId: parseInt(res.data[i].tokenId.hex,16),
+                md5: res.data[i].md5
             })
         }
+        console.log(cardList)
         getdata.value = true
     }
     // log error

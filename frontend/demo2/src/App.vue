@@ -7,6 +7,8 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <!-- <main> -->
   <RouterView />
+
+  <!-- welcome -->
 <!-- </main> -->
 </template>
 

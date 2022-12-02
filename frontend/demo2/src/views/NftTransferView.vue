@@ -65,6 +65,7 @@ library.add(faToolbox)
 
 const modalRef = ref<HTMLElement | null>(null)
 let modal: any;
+const BASE_IMG_URL = import.meta.env.PROD? '' :"http://localhost:5017/"
 
 const showSetTarget = () => {
     modal.show()
@@ -111,8 +112,10 @@ const handleSelection = (selectedItem:string) => {
 
 // NFT card type
 type Card = {
-    id: number;
+    id: string,
+    tokenId: number;
     img: string;
+    md5: string;
     bOn: boolean;
 }
 
@@ -134,11 +137,14 @@ const getAsset = async () => {
         cardList.length = 0
         for (let i = 0; i < res.data.length; i++) {
             cardList.push({
-                img: res.data[i].url,
                 id: res.data[i].tokenId,
+                img: BASE_IMG_URL+ res.data[i].url.toString().split('/')[1],
+                tokenId: parseInt(res.data[i].tokenId.hex,16),
+                md5: res.data[i].md5,
                 bOn: false
             })
         }
+        console.log("call transfer: ",cardList)
     }
     else if (res.status === 401) {
         alert('Invalid session token');
@@ -160,7 +166,7 @@ function isEtherAddress(address: string) {
 }
 
 // store address given by user
-let address = ref('')
+let address = ref('0x119de2C183CB2Ef9d4DB6507FD44A1D60a1980cf')
 let tempAddress = ref('')
 const saveWallet = () => {
     console.log("save wallet")
@@ -192,15 +198,20 @@ const makeTransfer = async () => {
         alert('Please select NFTs you want to transfer')
         return
     }
+
+    console.log("selectedNFTs", selectedNFTs)
+
     // transfer NFTs
     let transition = {
-        to: address.value,
-        tokenIds: selectedNFTs.map(function (value) {
+        address: address.value,
+        tokenId: selectedNFTs.map(function (value) {
+            console.log("value", value.id)
             return value.id
         })
     }
-    console.log("Target address: " + transition.to, "NFTs: " + transition.tokenIds)
-    let res = await nftTransfer(address.value);
+    console.log("transition", transition.tokenId)
+    console.log("Target address: " + transition.address, "NFTs: " + transition.tokenId)
+    let res = await nftTransfer(transition);
     if (res.status === 200) {
         console.log("Succeed to transfer NFTs")
     }

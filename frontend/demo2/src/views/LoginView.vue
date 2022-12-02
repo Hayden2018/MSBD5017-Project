@@ -87,8 +87,8 @@
 <script setup lang="ts">
 
 import { useRouter } from 'vue-router';
-import { ref, reactive, inject } from 'vue';
-import { login, register } from '@/api/http';
+import { ref, reactive, inject, onMounted } from 'vue';
+import { login, register, cookieLogin } from '@/api/http';
 
 
 let rememberUser = ref(false);
@@ -134,9 +134,18 @@ const registerToken = async () => {
 }
 
 
+onMounted(async () => {
+    // console.log(document.cookie)
+    // console.log("check cookie login");
+    // let res = await cookieLogin();
+    // console.log("cookieLogin", res);
+    // if(res.status === 200){
+    //     router.push('/home');
+    // }
+})
 
 </script>
 
 <style scoped>
 @import "../assets/scss/logview.scss";
-</style>
+</style>  

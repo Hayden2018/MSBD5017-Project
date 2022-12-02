@@ -79,6 +79,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" @click.prevent="sendMint">Save</button>
+                    <button type="button" class="btn btn-primary" @click.prevent="upMint">UP</button>
                 </div>
             </div>
         </div>
@@ -89,10 +90,10 @@
 
 <script setup lang="ts">
 import {reactive, ref, onMounted} from 'vue';
-import { nftMint } from '@/api/http';
+import { nftMint,selfNftMint } from '@/api/http';
 import { Modal } from 'bootstrap'
 
-let walletAddress = ref('0x0000000000000000000000000000000000000000');
+let walletAddress = ref('0x2B92f9fB9d3C8c1f0E371f6B0f0f1216116d0859');
 let error = ref('');
 let media:Array<aMedia> = reactive([])
 let loading = ref(false);
@@ -104,6 +105,7 @@ type aMedia = {
     url: string
     size: number,
     type: string,
+    f :any
 }
 
 // add new files
@@ -113,13 +115,14 @@ const fileChange = (event:any) => {
     
     for (let i = 0; i < files.length; i++) {
         let url = URL.createObjectURL(files[i]);
-        formData.set('file-'+ i.toString(), files[i]);    
+        // formData.set('file-'+ i.toString(), files[i]);    
 
         media.push({
             name: files[i].name,
             url: url,
             size: files[i].size,
-            type: files[i].type
+            type: files[i].type,
+            f: files[i]
         });
     }
     
@@ -135,18 +138,35 @@ const remove= (index:number) => {
 // send minted request
 const sendMint = async () => {
 
-    if(media.length == 0){
-        mintModal.hide()
-        error.value = 'Media is required';
-        return;
-    }
-
-    let res = await nftMint(formData);
+    console.log('send mint')
+    let res = await nftMint();
     if(res.status == 200){
         alert('Minted successfully');
     }else{
         alert('Error');
     }
+    mintModal.hide()
+}
+
+const upMint = async () => {
+    if(media.length == 0){
+        error.value = 'Please upload at least one image';
+        return;
+    }
+
+    formData = new FormData();
+    media.forEach( m => {
+        formData.append(m.name, m.f);
+    })
+    console.log("formData", formData)
+    let res = await selfNftMint(formData);
+    if(res.status === 200){
+        alert('Minted successfully');
+    }else{
+        alert('Error');
+    }
+    error.value = '';
+    mintModal.hide()
 }
 
 
