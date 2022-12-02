@@ -103,5 +103,11 @@ npm run build
 - IP： 124.223.197.77
 - password: Mylink5017
 
+### Server Deploy
+
+- installed ： nodejs,  pm2 ,  nginx
+- may run App.js  by pm2
+- nginx hasn't been configured and frontend-backend seems cannot communicate on server - but work normally on local pc
+
 
 

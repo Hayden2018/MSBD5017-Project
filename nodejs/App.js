@@ -7,9 +7,16 @@ const express = require('express')
 const cookieParser = require('cookie-parser')
 const md5File = require('md5-file')
 const app = express()
+
+// store NFT pics
 app.use(express.static('imgs'))
+// store vue frontend
+app.use(express.static('dist'))
 app.use(cookieParser())
 app.use(express.json())
+
+const multiparty = require("multiparty");
+const path = require('path')
 
 const sessions = {}
 
@@ -141,7 +148,10 @@ async function main() {
             let user = await Users.findOne({username: username})
             let wallet = new ethers.Wallet(user.privateKey, provider)
             let contractW = contract.connect(wallet)
-            await contractW.transferFrom(user.address, receiver, tokenId)
+            // transfer more than one images -> tokenID = [ {"type":"Big..", "id":"" } ,...]
+            tokenId.forEach(async (id) => {
+                await contractW.transferFrom(user.address, receiver, id)
+            })
             res.status(200).json({message: 'Success'})
         }
         else {
@@ -162,6 +172,36 @@ async function main() {
         else {
             res.status(401).json({error: 'Invalid session token or address'})
         }
+    })
+
+    // receive image from client, then mint NFT
+    app.post('/nft/selfMint', async (req, res) => {
+        const s = req.cookies['session']
+        const username = sessions[s]
+        const formData = new multiparty.Form()
+        // set images dir
+        formData.uploadDir = path.resolve(__dirname, 'imgs')
+        // process images
+        formData.parse(req, async (err, fields, files) => {
+            if (err) {
+                console.log(err)
+                res.status(500).json({error: 'Upload failed'})
+            }
+            else {
+                // check if user exists
+                if(username){
+                    let user = await Users.findOne({username: username})
+                    for(var f in files){
+                        img = files[f][0].path
+                        // only get image file name
+                        img = img.substring(img.indexOf('imgs')+5)
+                        let md5 = md5File.sync('imgs/' + img)
+                        await contractOwner.mint(user.address, 'localhost:5017/' + img, md5)
+                    }
+
+                }
+            }
+        })
     })
 }
 
