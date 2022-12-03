@@ -150,17 +150,12 @@ async function main() {
             let contractW = contract.connect(wallet)
             console.log("tranfer token id: ", tokenId, " to ", receiver)
             // transfer more than one images -> tokenID = [ {"type":"Big..", "id":"" } ,...]
-            for(let i = 0; i < tokenId.length; i++){
+            for (let i = 0; i < tokenId.length; i++) {
                 console.log("id: ", tokenId[i])
                 let tx = await contractW.transferFrom(user.address, receiver, tokenId[i])
                 await tx.wait()
                 console.log("transfer success: ", tokenId[i])
             }
-            // tokenId.forEach(async (id) => {
-            //     console.log("id: ", id)
-            //     const tx = await contractW.transferFrom(user.address, receiver, id)
-            //     await tx.wait()
-            // })
             res.status(200).json({message: 'Success'})
         }
         else {
